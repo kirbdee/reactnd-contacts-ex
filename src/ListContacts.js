@@ -9,12 +9,26 @@ class ListContacts extends Component {
   state = {
     query: ''
   }
-  handleChange = (newQuery) => {
+  updateQuery = (newQuery) => {
     this.setState((prevState) => ({
       query: newQuery.trim()
     }))
   }
+
+  clearQuery = () => this.updateQuery('');
+
   render() {
+    const { query } = this.state
+    const { contacts, onDelete } = this.props
+
+    const showingContacts = query === '' ? 
+        contacts : contacts.filter(
+          (contactEntry) => 
+            contactEntry.name.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    const isFiltered = contacts.length !== showingContacts.length
+
     return (
       <div className="list-contacts">
         <div className="list-contacts-top">
@@ -22,12 +36,16 @@ class ListContacts extends Component {
             className="search-contacts"
             type="text"
             placeholder="Search Contacts"
-            value={this.state.query}
-            onChange={(event) => this.handleChange(event.target.value)}
+            value={query}
+            onChange={(event) => this.updateQuery(event.target.value)}
           />
         </div>
+        {isFiltered ? 
+          (<div className="showing-contacts"><span>Now Showing {showingContacts.length} of {contacts.length}<button onClick={this.clearQuery}>Show all</button></span></div>)
+          : null
+        }
         <ol className='contact'>
-          {this.props.contacts.map((contact)=> (
+          {showingContacts.map((contact)=> (
             <li key={contact.id} className='contact-list-item'>
               <div 
                 className="contact-avatar" 
@@ -38,7 +56,7 @@ class ListContacts extends Component {
                 <p>{contact.name}</p>
                 <p>{contact.handle}</p>
               </div>
-              <button className='contact-remove' onClick={() => this.props.onDelete(contact)}>Remove</button>
+              <button className='contact-remove' onClick={() => onDelete(contact)}>Remove</button>
             </li>
           ))}
         </ol>
