@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ListContacts from './ListContacts';
 import * as ContactsAPI from './utils/ContactsAPI';
+import CreateContact from './CreateContact';
+import { Switch, Route } from 'react-router-dom';
 
 class App extends Component {
   state = {
@@ -24,9 +26,18 @@ class App extends Component {
   }
 
   render() {
+    const HomeRoute = (props) => (
+      <Route path={props.path} render={() => props.children}/>
+    )
+
     return (
       <div>
-        <ListContacts contacts={this.state.contacts} onDelete={this.removeContact}/>
+        <Switch>
+          <Route path='/create' component={CreateContact}/>
+          <HomeRoute path='/'>
+            <ListContacts contacts={this.state.contacts} onDelete={this.removeContact} />          
+          </HomeRoute>
+        </Switch>
       </div>
     );
   }
