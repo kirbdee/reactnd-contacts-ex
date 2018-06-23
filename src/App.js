@@ -9,6 +9,14 @@ class App extends Component {
     contacts: []
   }
 
+  createContact = (body) => {
+    ContactsAPI.create(body)
+      .then(ContactsAPI.getAll()
+        .then((data) => 
+          this.setState(() => ({ contacts: [...data]}))
+        )
+      );
+  }
   removeContact = (contact) => {
     ContactsAPI.remove(contact)
       .then(ContactsAPI.getAll()
@@ -26,17 +34,24 @@ class App extends Component {
   }
 
   render() {
-    const HomeRoute = (props) => (
+    const RouteWrapper = (props) => (
       <Route path={props.path} render={() => props.children}/>
     )
 
     return (
       <div>
         <Switch>
-          <Route path='/create' component={CreateContact}/>
-          <HomeRoute path='/'>
+          <Route path='/create' render={({history}) =>
+            <CreateContact onCreateContact={(contact) => 
+              {
+                this.createContact(contact);
+                history.push('/');
+              }
+            }/>
+          }/>
+          <RouteWrapper path='/'>
             <ListContacts contacts={this.state.contacts} onDelete={this.removeContact} />          
-          </HomeRoute>
+          </RouteWrapper>
         </Switch>
       </div>
     );
